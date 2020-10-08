@@ -1,0 +1,18 @@
+[package]
+name = "avrow-cli"
+version = "0.1.0"
+authors = ["creativcoder <creativcoders@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = {version="2.33.1", features=["yaml"] }
+avrow = { path = "../../ravro", features=["all"] }
+argh = "0.1.3"
+anyhow = "1.0.32"
+colored = "2.0.0"
+
+[[bin]]
+name = "av"
+path="src/main.rs"

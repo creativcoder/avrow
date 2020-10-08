@@ -1,0 +1,11 @@
+
+/target
+**/*.rs.bk
+Cargo.lock
+NOTES.md
+*.avro
+*.jar
+experiments/
+TODO.md
+# .vscode
+avrow-cli/target
