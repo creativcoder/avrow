@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/1.8.10/tailwind.min.css"
+        integrity="sha512-KO1h5ynYuqsFuEicc7DmOQc+S9m2xiCKYlC3zcZCSEw0RGDsxcMnppRaMZnb0DdzTDPaW22ID/gAGCZ9i+RT/w=="
+        crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/themes/prism-tomorrow.min.css"
+        integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg=="
+        crossorigin="anonymous" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Secular+One&display=swap');
+
+        h1 {
+            font-family: 'Secular One', sans-serif;
+        }
+
+        .bottom {
+            display: inline-block;
+            width: 4em;
+            height: 4em;
+            border: 0.2em solid white;
+            border-radius: 50%;
+            margin-left: 0.75em;
+        }
+
+        .bottom:after {
+            content: '';
+            display: inline-block;
+            margin-top: 0.6em;
+            margin-left: 0.8em;
+            width: 1.4em;
+            height: 1.4em;
+            border-top: 0.2em solid white;
+            border-right: 0.2em solid white;
+            -moz-transform: rotate(135deg);
+            -webkit-transform: rotate(135deg);
+            transform: rotate(135deg);
+        }
+
+    </style>
+</head>
+
+<body>
+    <section class="text-gray-700 body-font bg-blue-900 h-screen">
+        <div class="container mx-auto flex px-20 md:flex-row flex-col items-center py-10">
+            <div class="lg:max-w-lg lg:w-full md:w-1/2 w-5/6">
+                <img class="object-cover object-center rounded" alt="hero" src="./avrow_logo.png">
+            </div>
+            <div
+                class="lg:flex-grow md:w-1/2 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
+                <h1 class="title-font sm:text-4xl text-3xl mb-4 font-medium text-white">Avrow - a simple, type safe
+                    implementation
+                    of the <span><a class="text-teal-600" href="http://avro.apache.org/docs/current/spec.html">avro
+                            specification</a></span>
+                    in <span><a href="https://www.rust-lang.org/" class="text-orange-400">Rust</a></span>.
+                </h1>
+
+                <div class="flex justify-center">
+                    <a href="https://github.com/creativcoder/avrow"
+                        class="shadow-md inline-flex text-black bg-yellow-500 border-0 py-2 px-6 focus:outline-none hover:bg-yellow-700 hover:text-white rounded text-lg">Get
+                        started
+                    </a>
+                    <a href="https://docs.rs/avrow"
+                        class="shadow-md ml-4 inline-flex text-gray-700 bg-gray-200 border-0 py-2 px-6 focus:outline-none hover:bg-gray-300 rounded text-lg">API
+                        Documentation</a>
+                </div>
+
+
+            </div>
+
+        </div>
+    </section>
+</body>
+
+</html>
