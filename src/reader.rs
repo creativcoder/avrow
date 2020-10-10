@@ -28,11 +28,6 @@ use value::{FieldValue, Record, Value};
 pub struct Reader<R> {
     source: R,
     header: Header,
-    // TODO when reading data call resolve schema https://avro.apache.org/docs/1.8.2/spec.html#Schema+Resolution
-    // This is the schema after it has been resolved using both reader and writer schema
-    // NOTE: This is a partially resolved schema
-    // schema: Option<ResolvedSchema>,
-    // TODO this is for experimental purposes, ideally we can just use references
     reader_schema: Option<Schema>,
     block_buffer: Cursor<Vec<u8>>,
     entries_in_block: u64,

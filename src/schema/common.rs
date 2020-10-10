@@ -188,7 +188,7 @@ impl Name {
 }
 
 impl Display for Name {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(ref namespace) = self.namespace {
             write!(f, "{}.{}", namespace, self.name)
         } else {

@@ -1,8 +1,8 @@
 <div align="center">
   <img alt="avrow" width="250" src="assets/avrow_logo.png" />
 
-[![github actions](https://github.com/creativcoder/avrow/workflows/Rust/badge.svg)](https://github.com/creativcoder/avrow/actions)
-[![crates](https://img.shields.io/crates/v/avrow.svg)](https://crates.io/crates/io-uring)
+[![Actions Status](https://github.com/creativcoder/avrow/workflows/ci/badge.svg)](https://github.com/creativcoder/avrow/actions)
+[![crates](https://img.shields.io/crates/v/avrow.svg)](https://crates.io/crates/avrow)
 [![docs.rs](https://docs.rs/avrow/badge.svg)](https://docs.rs/avrow/)
 [![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/creativcoder/avrow/blob/master/LICENSE-MIT)
 [![license](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/creativcoder/avrow/blob/master/LICENSE-APACHE)
@@ -81,7 +81,7 @@ Add avrow as a dependency to `Cargo.toml`:
 
 ```toml
 [dependencies]
-avrow = "0.1"
+avrow = "0.1.0"
 ```
 
 ## Examples:
@@ -112,7 +112,7 @@ fn main() -> Result<(), Error> {
 }
 
 ```
-For simple and native Rust types, avrow provides a `From` impl for Avro value types. For compound or user defined types (structs, enums), one can use the `serialize` method which relies on serde. Alternatively, one can construct `avrow::Value` instances which is a more verbose way to write avro values and should be a last resort.
+For simple and native Rust types, avrow provides a `From` impl to convert to Avro value types. For compound or user defined types (structs or enums), one can use the `serialize` method which relies on serde. Alternatively, one can construct `avrow::Value` instances which is a more verbose way to write avro values and should be a last resort.
 
 ### Reading avro data
 
