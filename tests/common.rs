@@ -40,7 +40,7 @@ pub(crate) fn writer_from_schema<'a>(schema: &'a Schema, codec: Codec) -> Writer
     writer
 }
 
-pub(crate) fn reader_with_schema<'a>(schema: Schema, buffer: Vec<u8>) -> Reader<Cursor<Vec<u8>>> {
+pub(crate) fn reader_with_schema<'a>(schema: &Schema, buffer: Vec<u8>) -> Reader<Cursor<Vec<u8>>> {
     let reader = Reader::with_schema(Cursor::new(buffer), schema).unwrap();
     reader
 }

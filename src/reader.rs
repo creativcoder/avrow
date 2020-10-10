@@ -25,15 +25,15 @@ use std::str::FromStr;
 use value::{FieldValue, Record, Value};
 
 /// Reader is the primary interface for reading data from an avro datafile.
-pub struct Reader<R> {
+pub struct Reader<'a, R> {
     source: R,
     header: Header,
-    reader_schema: Option<Schema>,
+    reader_schema: Option<&'a Schema>,
     block_buffer: Cursor<Vec<u8>>,
     entries_in_block: u64,
 }
 
-impl<R> Reader<R>
+impl<'a, R> Reader<'a, R>
 where
     R: Read,
 {
@@ -50,7 +50,7 @@ where
     }
 
     /// Create a Reader with the given reader schema and a readable buffer.
-    pub fn with_schema(mut source: R, reader_schema: Schema) -> Result<Self, AvrowErr> {
+    pub fn with_schema(mut source: R, reader_schema: &'a Schema) -> Result<Self, AvrowErr> {
         let header = Header::from_reader(&mut source)?;
 
         Ok(Reader {
@@ -121,7 +121,7 @@ pub fn from_value<'de, D: Deserialize<'de>>(
     }
 }
 
-impl<'a, 's, R: Read> Iterator for Reader<R> {
+impl<'a, 's, R: Read> Iterator for Reader<'_, R> {
     type Item = Result<Value, AvrowErr>;
 
     fn next(&mut self) -> Option<Self::Item> {

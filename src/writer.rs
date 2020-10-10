@@ -291,7 +291,7 @@ mod tests {
         writer.serialize(()).unwrap();
         let _v = writer.into_inner().unwrap();
 
-        let reader = Reader::with_schema(_v.as_slice(), schema).unwrap();
+        let reader = Reader::with_schema(_v.as_slice(), &schema).unwrap();
         for i in reader {
             let _: () = from_value(&i).unwrap();
         }
@@ -312,7 +312,7 @@ mod tests {
         writer.serialize(()).unwrap();
         let _v = writer.into_inner().unwrap();
 
-        let reader = Reader::with_schema(_v.as_slice(), schema).unwrap();
+        let reader = Reader::with_schema(_v.as_slice(), &schema).unwrap();
         assert!(reader.meta().contains_key("hello"));
     }
 }

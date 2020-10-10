@@ -21,7 +21,7 @@ fn null_fails_with_other_primitive_schema() {
     let buf = writer.into_inner().unwrap();
 
     let reader_schema = MockSchema.prim("boolean");
-    let reader = Reader::with_schema(buf.as_slice(), reader_schema).unwrap();
+    let reader = Reader::with_schema(buf.as_slice(), &reader_schema).unwrap();
 
     for i in reader {
         let _ = i.unwrap();
@@ -41,7 +41,7 @@ fn writer_to_reader_promotion_primitives() {
         let buf = writer.into_inner().unwrap();
 
         let reader_schema = MockSchema.prim(reader_schema);
-        let reader = Reader::with_schema(buf.as_slice(), reader_schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &reader_schema).unwrap();
         for i in reader {
             assert!(i.is_ok());
             let _a = i.unwrap();
@@ -59,7 +59,7 @@ fn writer_to_reader_promotion_primitives() {
         let buf = writer.into_inner().unwrap();
 
         let reader_schema = MockSchema.prim(reader_schema);
-        let reader = Reader::with_schema(buf.as_slice(), reader_schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &reader_schema).unwrap();
         for i in reader {
             assert!(i.is_ok());
         }
@@ -76,7 +76,7 @@ fn writer_to_reader_promotion_primitives() {
         let buf = writer.into_inner().unwrap();
 
         let reader_schema = MockSchema.prim(reader_schema);
-        let reader = Reader::with_schema(buf.as_slice(), reader_schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &reader_schema).unwrap();
         for i in reader {
             assert!(i.is_ok());
         }
@@ -93,7 +93,7 @@ fn writer_to_reader_promotion_primitives() {
         let buf = writer.into_inner().unwrap();
 
         let reader_schema = MockSchema.prim(reader_schema);
-        let reader = Reader::with_schema(buf.as_slice(), reader_schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &reader_schema).unwrap();
         for i in reader {
             assert!(i.is_ok());
             let a = i.unwrap();
@@ -112,7 +112,7 @@ fn writer_to_reader_promotion_primitives() {
         let buf = writer.into_inner().unwrap();
 
         let reader_schema = MockSchema.prim(reader_schema);
-        let reader = Reader::with_schema(buf.as_slice(), reader_schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &reader_schema).unwrap();
         for i in reader {
             assert!(i.is_ok());
             let a = i.unwrap();
@@ -144,7 +144,7 @@ fn enum_fails_schema_resolution() {
     // Reading a symbol which does not exist in writer's schema should fail
     let reader_schema =
         Schema::from_str(r##"{"type": "enum", "name": "Foo", "symbols": ["F"] }"##).unwrap();
-    let reader = Reader::with_schema(buf.as_slice(), reader_schema).unwrap();
+    let reader = Reader::with_schema(buf.as_slice(), &reader_schema).unwrap();
 
     // let reader = reader_with_schema(reader_schema, name);
     for i in reader {
@@ -167,7 +167,7 @@ fn schema_resolution_map() {
     // // Reading a symbol which does not exist in writer's schema should fail
     let reader_schema = Schema::from_str(r##"{"type": "map", "values": "int"}"##).unwrap();
 
-    let reader = reader_with_schema(reader_schema, buf);
+    let reader = reader_with_schema(&reader_schema, buf);
     for i in reader {
         let _ = i.unwrap();
     }
@@ -200,7 +200,7 @@ fn record_schema_resolution_with_default_value() {
     let buf = writer.into_inner().unwrap();
 
     let schema = MockSchema.record_default();
-    let reader = reader_with_schema(schema, buf);
+    let reader = reader_with_schema(&schema, buf);
     for i in reader {
         let rec: Result<LongListDefault, _> = from_value(&i);
         assert!(rec.is_ok());
@@ -219,7 +219,7 @@ fn writer_is_a_union_but_reader_is_not() {
 
     let schema_str = r##""int""##;
     let reader_schema = Schema::from_str(schema_str).unwrap();
-    let mut reader = reader_with_schema(reader_schema, buf);
+    let mut reader = reader_with_schema(&reader_schema, buf);
     assert!(reader.next().unwrap().is_err());
     assert!(reader.next().unwrap().is_ok());
 }
@@ -234,12 +234,12 @@ fn reader_is_a_union_but_writer_is_not() {
 
     // err
     let reader_schema = Schema::from_str(r##"["null", "string"]"##).unwrap();
-    let mut reader = reader_with_schema(reader_schema, buf.clone());
+    let mut reader = reader_with_schema(&reader_schema, buf.clone());
     assert!(reader.next().unwrap().is_err());
 
     // ok
     let reader_schema = Schema::from_str(r##"["null", "int"]"##).unwrap();
-    let mut reader = reader_with_schema(reader_schema, buf);
+    let mut reader = reader_with_schema(&reader_schema, buf);
     assert!(reader.next().unwrap().is_ok());
 }
 
@@ -252,7 +252,7 @@ fn both_are_unions_but_different() {
     let buf = writer.into_inner().unwrap();
 
     let reader_schema = Schema::from_str(r##"["boolean", "string"]"##).unwrap();
-    let mut reader = reader_with_schema(reader_schema, buf);
+    let mut reader = reader_with_schema(&reader_schema, buf);
 
     // err
     assert!(reader.next().unwrap().is_err());
@@ -271,7 +271,7 @@ fn both_are_map() {
     // let reader_schema =
     //     Schema::from_str(r##"["boolean", {"type":"map", "values": "string"}]"##).unwrap();
     let reader_schema = Schema::from_str(r##"{"type": "map", "values": "string"}"##).unwrap();
-    let mut reader = reader_with_schema(reader_schema, buf);
+    let mut reader = reader_with_schema(&reader_schema, buf);
     assert!(reader.next().unwrap().is_ok());
 }
 
@@ -284,7 +284,7 @@ fn both_are_arrays() {
     let buf = writer.into_inner().unwrap();
 
     let reader_schema = Schema::from_str(r##"{"type": "array", "items": "int"}"##).unwrap();
-    let mut reader = reader_with_schema(reader_schema, buf);
+    let mut reader = reader_with_schema(&reader_schema, buf);
     assert!(reader.next().unwrap().is_ok());
 }
 
@@ -297,7 +297,7 @@ fn both_are_enums() {
     let buf = writer.into_inner().unwrap();
 
     let reader_schema = Schema::from_str(r##"{"type": "array", "items": "int"}"##).unwrap();
-    let mut reader = reader_with_schema(reader_schema, buf);
+    let mut reader = reader_with_schema(&reader_schema, buf);
     assert!(reader.next().unwrap().is_ok());
 }
 
@@ -310,6 +310,6 @@ fn null() {
     let buf = writer.into_inner().unwrap();
 
     let reader_schema = Schema::from_str(r##"{"type": "null"}"##).unwrap();
-    let mut reader = reader_with_schema(reader_schema, buf);
+    let mut reader = reader_with_schema(&reader_schema, buf);
     assert!(reader.next().unwrap().is_ok());
 }

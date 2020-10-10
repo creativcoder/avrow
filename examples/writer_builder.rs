@@ -14,7 +14,7 @@ fn main() -> Result<(), Error> {
     writer.serialize(())?;
     let v = writer.into_inner()?;
 
-    let reader = Reader::with_schema(v.as_slice(), schema)?;
+    let reader = Reader::with_schema(v.as_slice(), &schema)?;
     for i in reader {
         dbg!(i?);
     }

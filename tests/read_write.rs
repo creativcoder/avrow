@@ -83,7 +83,8 @@ fn read_write_primitive() {
             let buf = writer.into_inner().unwrap();
 
             // read
-            let reader = Reader::with_schema(buf.as_slice(), MockSchema.prim(name)).unwrap();
+            let schema = MockSchema.prim(name);
+            let reader = Reader::with_schema(buf.as_slice(), &schema).unwrap();
             for i in reader {
                 match primitive {
                     Primitive::Null => {
@@ -166,7 +167,7 @@ fn io_read_write_self_referential_record() {
         let buf = writer.into_inner().unwrap();
 
         // read
-        let reader = Reader::with_schema(buf.as_slice(), schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &schema).unwrap();
         for i in reader {
             let _: LongList = from_value(&i).unwrap();
         }
@@ -204,7 +205,7 @@ fn enum_read_write() {
         let buf = writer.into_inner().unwrap();
 
         // read
-        let reader = Reader::with_schema(buf.as_slice(), schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &schema).unwrap();
         for i in reader {
             let _: Suit = from_value(&i).unwrap();
         }
@@ -230,7 +231,7 @@ fn array_read_write() {
         let buf = writer.into_inner().unwrap();
 
         // read
-        let reader = Reader::with_schema(buf.as_slice(), schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &schema).unwrap();
         for i in reader {
             let _: Vec<&str> = from_value(&i).unwrap();
         }
@@ -258,7 +259,7 @@ fn map_read_write() {
         let buf = writer.into_inner().unwrap();
 
         // read
-        let reader = Reader::with_schema(buf.as_slice(), schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &schema).unwrap();
         for i in reader {
             let _: HashMap<String, i64> = from_value(&i).unwrap();
         }
@@ -284,7 +285,7 @@ fn union_read_write() {
         let buf = writer.into_inner().unwrap();
 
         // read
-        let reader = Reader::with_schema(buf.as_slice(), schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &schema).unwrap();
         for i in reader {
             let val = i.as_ref().unwrap();
             match val {
@@ -322,7 +323,7 @@ fn fixed_read_write() {
         let buf = writer.into_inner().unwrap();
 
         // read
-        let reader = Reader::with_schema(buf.as_slice(), schema).unwrap();
+        let reader = Reader::with_schema(buf.as_slice(), &schema).unwrap();
         for i in reader {
             let a: [u8; 16] = from_value(&i).unwrap();
             assert_eq!(a.len(), 16);
@@ -341,7 +342,7 @@ fn bytes_read_write() {
     let buf = writer.into_inner().unwrap();
     // let mut v: Vec<u8> = vec![];
 
-    let reader = Reader::with_schema(buf.as_slice(), schema).unwrap();
+    let reader = Reader::with_schema(buf.as_slice(), &schema).unwrap();
     for i in reader {
         // dbg!(i);
         let b: &[u8] = from_value(&i).unwrap();

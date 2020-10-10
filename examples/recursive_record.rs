@@ -46,7 +46,7 @@ fn main() -> Result<(), Error> {
     let buf = writer.into_inner()?;
 
     // read
-    let reader = Reader::with_schema(buf.as_slice(), schema)?;
+    let reader = Reader::with_schema(buf.as_slice(), &schema)?;
     for i in reader {
         let a: LongList = from_value(&i)?;
         dbg!(a);
