@@ -38,10 +38,10 @@ where
     R: Read,
 {
     /// Creates a Reader from an avro encoded readable buffer.
-    pub fn new(mut avro_source: R) -> Result<Self, AvrowErr> {
-        let header = Header::from_reader(&mut avro_source)?;
+    pub fn new(mut source: R) -> Result<Self, AvrowErr> {
+        let header = Header::from_reader(&mut source)?;
         Ok(Reader {
-            source: avro_source,
+            source,
             header,
             reader_schema: None,
             block_buffer: Cursor::new(vec![0u8; DEFAULT_FLUSH_INTERVAL]),

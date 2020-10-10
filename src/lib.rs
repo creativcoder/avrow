@@ -1,13 +1,14 @@
 //! Avrow is a pure Rust implementation of the [Apache Avro specification](https://avro.apache.org/docs/current/spec.html).
 //!
-//! For more details on the spec, head over to [FAQ](https://cwiki.apache.org/confluence/display/AVRO/FAQ)
+//! Pleaes refer to the [README](https://github.com/creativcoder/avrow/blob/main/README.md) for an overview.
+//! For more details on the spec, head over to the [FAQ](https://cwiki.apache.org/confluence/display/AVRO/FAQ).
 //!
 //! ## Using the library
 //!
 //! Add to your `Cargo.toml`:
 //!```toml
 //! [dependencies]
-//! avrow = "0.1"
+//! avrow = "0.2.0"
 //!```
 //! ### A hello world example of reading and writing avro data files
 

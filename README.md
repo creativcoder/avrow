@@ -81,7 +81,7 @@ Add avrow as a dependency to `Cargo.toml`:
 
 ```toml
 [dependencies]
-avrow = "0.1.0"
+avrow = "0.2.0"
 ```
 
 ## Examples:
@@ -129,7 +129,7 @@ fn main() -> Result<(), Error> {
         183, 148, 48, 236, 212, 250, 38, 208,
     ];
     // Create a Reader
-    let reader = Reader::with_schema(v.as_slice(), schema)?;
+    let reader = Reader::with_schema(v.as_slice(), &schema)?;
     for i in reader {
         dbg!(&i);
     }
@@ -191,7 +191,7 @@ fn main() -> Result<(), Error> {
     let buf = writer.into_inner()?;
 
     // read
-    let reader = Reader::with_schema(buf.as_slice(), schema)?;
+    let reader = Reader::with_schema(buf.as_slice(), &schema)?;
     for i in reader {
         let a: LongList = from_value(&i)?;
         dbg!(a);
@@ -271,7 +271,7 @@ fn main() -> Result<(), Error> {
     writer.write(rec)?;
 
     let avro_data = writer.into_inner()?;
-    let reader = crate::Reader::from(avro_data.as_slice())?;
+    let reader = crate::Reader::new(avro_data.as_slice())?;
     for value in reader {
         let mentors: RustMentors = from_value(&value)?;
         dbg!(mentors);

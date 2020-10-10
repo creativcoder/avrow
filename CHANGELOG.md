@@ -6,10 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # [Unreleased]
 
+## 0.2.0 - 2020-10-10
 
-# [0.1.0] - 2020-10-08
+### Changed
 
-## Added
+- Reader takes a reference to the schema.
+
+## 0.1.0 - 2020-10-08
+
+### Added
 
 Initial implementation of
 - avrow
