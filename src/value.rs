@@ -3,6 +3,7 @@
 use crate::error::AvrowErr;
 use crate::schema;
 use crate::schema::common::validate_name;
+use crate::schema::parser::parse_default;
 use crate::schema::Registry;
 use crate::util::{encode_long, encode_raw_bytes};
 use crate::Schema;
@@ -37,7 +38,9 @@ impl FieldValue {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
-/// The [record](https://avro.apache.org/docs/current/spec.html#schema_record) avro type
+/// The [Record](https://avro.apache.org/docs/current/spec.html#schema_record) avro type.
+/// Avro records translates to a struct in Rust. Any struct that implements serde's
+/// Serializable trait can be converted to an avro record.
 pub struct Record {
     pub(crate) name: String,
     pub(crate) fields: IndexMap<String, FieldValue>,
@@ -60,7 +63,7 @@ impl Record {
         Ok(())
     }
 
-    /// Sets the ordering of the field.
+    /// Sets the ordering of the field in the record.
     pub fn set_field_order(&mut self, field_name: &str, order: Order) -> Result<(), AvrowErr> {
         let a = self
             .fields
@@ -71,7 +74,7 @@ impl Record {
     }
 
     /// Creates a record from a [BTreeMap](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) by consuming it.
-    /// The values in BTreeMap must implement Into<Value>. The name provided must match with the name in the record
+    /// The values in `BTreeMap` must implement `Into<Value>`. The `name` provided must match with the name in the record
     /// schema being provided to the writer.
     pub fn from_btree<K: Into<String> + Ord + Display, V: Into<Value>>(
         name: &str,
@@ -89,20 +92,37 @@ impl Record {
         Ok(record)
     }
 
-    /// Creates a record from a json object. A confirming record schema must be provided.
+    /// Creates a record from a JSON object (serde_json::Value). A confirming record schema must be provided.
     pub fn from_json(
         json: serde_json::Map<String, serde_json::Value>,
         schema: &Schema,
     ) -> Result<Value, AvrowErr> {
-        // let variant = schema.variant;
-        if let Variant::Record { name, fields, .. } = &schema.variant {
-            let mut values = IndexMap::new();
-            for (k, v) in json {
-                let parsed_value = crate::schema::parser::parse_default(
-                    &v,
-                    &fields.get(&k).ok_or(AvrowErr::DefaultValueParse)?.ty,
-                )?;
-                values.insert(k.to_string(), FieldValue::new(parsed_value));
+        if let Variant::Record {
+            name,
+            fields: record_schema_fields,
+            ..
+        } = &schema.variant
+        {
+            let mut values = IndexMap::with_capacity(record_schema_fields.len());
+            'fields: for (k, v) in record_schema_fields {
+                if let Some(default_value) = json.get(k) {
+                    if let Variant::Union { variants } = &v.ty {
+                        for var in variants {
+                            if let Ok(v) = parse_default(&default_value, &var) {
+                                values.insert(k.to_string(), FieldValue::new(v));
+                                continue 'fields;
+                            }
+                        }
+                        return Err(AvrowErr::FailedDefaultUnion);
+                    } else {
+                        let parsed_value = parse_default(&default_value, &v.ty)?;
+                        values.insert(k.to_string(), FieldValue::new(parsed_value));
+                    }
+                } else if let Some(v) = &v.default {
+                    values.insert(k.to_string(), FieldValue::new(v.clone()));
+                } else {
+                    return Err(AvrowErr::FieldNotFound);
+                }
             }
 
             Ok(Value::Record(crate::value::Record {
@@ -633,6 +653,7 @@ mod tests {
     use super::Record;
     use crate::from_value;
     use crate::Schema;
+    use crate::Value;
     use serde::{Deserialize, Serialize};
     use std::collections::BTreeMap;
     use std::str::FromStr;
@@ -743,11 +764,34 @@ mod tests {
         let rec = super::Record::from_json(json, &schema).unwrap();
         let mut writer = crate::Writer::new(&schema, vec![]).unwrap();
         writer.write(rec).unwrap();
-        // writer.flush().unwrap();
         let avro_data = writer.into_inner().unwrap();
         let reader = crate::Reader::new(avro_data.as_slice()).unwrap();
         for value in reader {
             let _mentors: RustMentors = from_value(&value).unwrap();
         }
+    }
+
+    #[test]
+    fn record_has_fields_with_default() {
+        let schema_str = r##"
+        {
+            "namespace": "sensor.data",
+            "type": "record",
+            "name": "common",
+            "fields" : [
+                {"name": "data", "type": ["null", "string"], "default": null}
+            ]
+        }
+"##;
+
+        let sample_data = r#"{
+            "data": null
+        }"#;
+
+        let serde_json = serde_json::from_str(sample_data).unwrap();
+        let schema = Schema::from_str(schema_str).unwrap();
+        let rec = Record::from_json(serde_json, &schema).unwrap();
+        let field = &rec.as_record().unwrap().fields["data"];
+        assert_eq!(field.value, Value::Null);
     }
 }

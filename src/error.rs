@@ -139,8 +139,6 @@ pub enum AvrowErr {
     UnknownSchema,
     #[error("Expected record field to be a json object, found {0}")]
     InvalidSchema(String),
-    #[error("{0}")]
-    InvalidDefaultValue(String),
     #[error("Invalid type for {0}")]
     InvalidType(String),
     #[error("Enum schema parsing failed, found: {0}")]
