@@ -226,10 +226,9 @@ pub struct Field {
     pub(crate) aliases: Option<Vec<String>>,
 }
 
-// TODO do we also use order for equality?
 impl std::cmp::PartialEq for Field {
     fn eq(&self, other: &Self) -> bool {
-        self.name == other.name && self.ty == other.ty
+        self.name == other.name && self.ty == other.ty && self.order == other.order
     }
 }
 

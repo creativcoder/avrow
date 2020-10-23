@@ -439,7 +439,7 @@ mod tests {
             "value",
             Variant::Long,
             Some(Value::Long(1)),
-            Order::Ascending,
+            Order::Descending,
             None,
         )
         .unwrap();
