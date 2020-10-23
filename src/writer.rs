@@ -1,12 +1,8 @@
 //! The Writer is the primary interface for writing values in avro encoded format.
 
-use rand::{thread_rng, Rng};
-
 use crate::codec::Codec;
 use crate::schema::Schema;
 use crate::value::Value;
-use serde::Serialize;
-
 use crate::config::{DEFAULT_FLUSH_INTERVAL, MAGIC_BYTES, SYNC_MARKER_SIZE};
 use crate::error::{AvrowErr, AvrowResult};
 use crate::schema::Registry;
@@ -14,6 +10,8 @@ use crate::schema::Variant;
 use crate::serde_avro;
 use crate::util::{encode_long, encode_raw_bytes};
 use crate::value::Map;
+use serde::Serialize;
+use rand::{thread_rng, Rng};
 use std::collections::HashMap;
 use std::default::Default;
 use std::io::Write;
@@ -34,7 +32,7 @@ pub struct WriterBuilder<'a, W> {
 }
 
 impl<'a, W: Write> WriterBuilder<'a, W> {
-    /// Creates a builder instance to construct a Writer
+    /// Creates a builder instance to construct a Writer.
     pub fn new() -> Self {
         WriterBuilder {
             metadata: Default::default(),
@@ -52,35 +50,34 @@ impl<'a, W: Write> WriterBuilder<'a, W> {
         self
     }
 
-    /// Set one of the available codec. This requires the respective code feature flags to be enabled.
+    /// Set one of the available codecs. This requires the respective feature flags to be enabled.
     pub fn set_codec(mut self, codec: Codec) -> Self {
         self.codec = codec;
         self
     }
 
-    /// Provide the writer with a reference to the schema file
+    /// Provide the writer with a reference to the schema file.
     pub fn set_schema(mut self, schema: &'a Schema) -> Self {
         self.schema = Some(schema);
         self
     }
 
-    /// Set the underlying output stream. This can be anything which implements the Write trait.
+    /// Set the underlying output stream. This can be any type that implements the `Write` trait.
     pub fn set_datafile(mut self, w: W) -> Self {
         self.datafile = Some(w);
         self
     }
 
-    /// Set the flush interval (bytes) for the internal block buffer. It's the amount of bytes post which
-    /// the internal buffer is written to the underlying datafile. Defaults to [DEFAULT_FLUSH_INTERVAL].
+    /// Set the flush interval (in bytes) for the internal buffer. It's the amount of bytes post which
+    /// the internal buffer is written to the underlying datafile or output stream..
+    /// Defaults to [`DEFAULT_FLUSH_INTERVAL`](config/constant.DEFAULT_FLUSH_INTERVAL.html).
     pub fn set_flush_interval(mut self, interval: usize) -> Self {
         self.flush_interval = interval;
         self
     }
 
-    /// Builds the Writer instance consuming this builder.
+    /// Builds the `Writer` instance consuming this builder.
     pub fn build(self) -> AvrowResult<Writer<'a, W>> {
-        // write the metadata
-        // Writer::with_codec(&self.schema, self.datafile, self.codec)
         let mut writer = Writer {
             out_stream: self.datafile.ok_or(AvrowErr::WriterBuildFailed)?,
             schema: self.schema.ok_or(AvrowErr::WriterBuildFailed)?,
@@ -103,7 +100,7 @@ impl<'a, W: Write> Default for WriterBuilder<'a, W> {
 
 /// The Writer is the primary interface for writing values to an avro datafile or a byte container (say a `Vec<u8>`).
 /// It takes a reference to the schema for validating the values being written
-/// and an output stream W which can be any type
+/// and an output stream `W` which can be any type
 /// implementing the [Write](https://doc.rust-lang.org/std/io/trait.Write.html) trait.
 pub struct Writer<'a, W> {
     out_stream: W,
@@ -116,7 +113,8 @@ pub struct Writer<'a, W> {
 }
 
 impl<'a, W: Write> Writer<'a, W> {
-    /// Creates a new avro Writer instance taking a reference to a `Schema` and and a `Write`.
+    /// Creates a new avro `Writer` instance taking a reference to a `Schema`
+    /// and a type implementing [`Write`](https://doc.rust-lang.org/std/io/trait.Write.html).
     pub fn new(schema: &'a Schema, out_stream: W) -> AvrowResult<Self> {
         let mut writer = Writer {
             out_stream,
@@ -131,8 +129,8 @@ impl<'a, W: Write> Writer<'a, W> {
         Ok(writer)
     }
 
-    /// Same as the new method, but additionally takes a `Codec` as parameter.
-    /// Codecs can be used to compress the encoded data being written in avro format.
+    /// Same as the `new` method, but additionally takes a `Codec` as parameter.
+    /// Codecs can be used to compress the encoded data being written in an avro datafile.
     /// Supported codecs as per spec are:
     /// * null (default): No compression is applied.
     /// * [snappy](https://en.wikipedia.org/wiki/Snappy_(compression)) (`--features snappy`)
@@ -157,7 +155,9 @@ impl<'a, W: Write> Writer<'a, W> {
     /// Appends a value to the buffer.
     /// Before a value gets written, it gets validated with the schema referenced
     /// by this writer.
-    /// **Note**: writes are buffered internally as per the flush interval and the underlying
+    ///
+    /// # Note:
+    /// writes are buffered internally as per the flush interval (for performance) and the underlying
     /// buffer may not reflect values immediately.
     /// Call [`flush`](struct.Writer.html#method.flush) to explicitly write all buffered data.
     /// Alternatively calling [`into_inner`](struct.Writer.html#method.into_inner) on the writer
@@ -194,7 +194,6 @@ impl<'a, W: Write> Writer<'a, W> {
     }
 
     /// Sync/flush any buffered data to the underlying buffer.
-    /// Note: This method is called to ensure that all
     pub fn flush(&mut self) -> AvrowResult<()> {
         // bail if no data is written or it has already been flushed before
         if self.block_count == 0 {
@@ -248,8 +247,8 @@ impl<'a, W: Write> Writer<'a, W> {
         Ok(())
     }
 
-    /// Consumes self and yields the inner Write instance.
-    /// Additionally calls flush if no flush has happened before this call.
+    /// Consumes self and yields the inner `Write` instance.
+    /// Additionally calls `flush` if no flush has happened before this call.
     pub fn into_inner(mut self) -> AvrowResult<W> {
         self.flush()?;
         Ok(self.out_stream)
