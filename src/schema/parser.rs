@@ -304,8 +304,8 @@ impl Registry {
 
 // Parses the `order` of a field, defaults to `ascending` order
 pub(crate) fn parse_field_order(order: &JsonValue) -> AvrowResult<Order> {
-    match *order {
-        JsonValue::String(ref s) => match &**s {
+    match order {
+        JsonValue::String(s) => match s.as_ref() {
             "ascending" => Ok(Order::Ascending),
             "descending" => Ok(Order::Descending),
             "ignore" => Ok(Order::Ignore),

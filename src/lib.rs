@@ -1,16 +1,16 @@
 //! Avrow is a pure Rust implementation of the [Apache Avro specification](https://avro.apache.org/docs/current/spec.html).
 //!
-//! Pleaes refer to the [README](https://github.com/creativcoder/avrow/blob/main/README.md) for an overview.
+//! Please refer to the [README](https://github.com/creativcoder/avrow/blob/main/README.md) for an overview.
 //! For more details on the spec, head over to the [FAQ](https://cwiki.apache.org/confluence/display/AVRO/FAQ).
 //!
 //! ## Using the library
 //!
-//! Add to your `Cargo.toml`:
+//! Add avrow to your `Cargo.toml`:
 //!```toml
 //! [dependencies]
 //! avrow = "0.2.0"
 //!```
-//! ### A hello world example of reading and writing avro data files
+//! ## A hello world example of reading and writing avro data files
 
 //!```rust
 //! use avrow::{Reader, Schema, Writer, from_value};
@@ -26,7 +26,7 @@
 //!     let mut writer = Writer::new(&schema, vec![])?;
 //!     // Write data using write
 //!     writer.write(())?;
-//!     // or serialize
+//!     // or serialize via serde
 //!     writer.serialize(())?;
 //!     // retrieve the underlying buffer using the into_inner method.
 //!     let buf = writer.into_inner()?;
@@ -49,7 +49,6 @@
 
 //!```
 
-// TODO update logo
 #![doc(
     html_favicon_url = "https://raw.githubusercontent.com/creativcoder/avrow/main/assets/avrow_logo.png"
 )]

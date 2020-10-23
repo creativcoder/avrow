@@ -1,5 +1,5 @@
 // This module contains definition of types that are common across a subset of
-// avro schemas.
+// avro Schema implementation.
 
 use crate::error::AvrowErr;
 use crate::schema::Variant;
@@ -33,8 +33,8 @@ pub(crate) fn validate_namespace(s: &str) -> Result<(), AvrowErr> {
     Ok(())
 }
 
-/// Represents `fullname` attribute and its constituents
-/// of a named avro type i.e, Record, Fixed and Enum
+/// Represents the `fullname` attribute
+/// of a named avro type i.e, Record, Fixed and Enum.
 #[derive(Debug, Clone, Eq, PartialOrd, Ord)]
 pub struct Name {
     pub(crate) name: String,
@@ -42,7 +42,7 @@ pub struct Name {
 }
 
 impl Name {
-    // Creates an validates the name. This will also extract the namespace if a dot is present in `name`
+    // Creates a new name with validation. This will extract the namespace if a dot is present in `name`
     // Any further calls to set_namespace, will be a noop if the name already contains a dot.
     pub(crate) fn new(name: &str) -> Result<Self, AvrowErr> {
         let mut namespace = None;
@@ -56,10 +56,6 @@ impl Name {
             validate_name(0, name)?;
             name
         } else {
-            // TODO perform namespace lookups from enclosing schema if any
-            // This will require us to pass context to this method.
-            // Update: this is now handled by from_json method as that's called from places
-            // where we have context on most tightly enclosing schema.
             validate_name(0, name)?;
             name
         };
@@ -70,7 +66,6 @@ impl Name {
         })
     }
 
-    // TODO also parse namespace from json value
     pub(crate) fn from_json(
         json: &serde_json::map::Map<String, JsonValue>,
         enclosing_namespace: Option<&str>,
@@ -105,7 +100,6 @@ impl Name {
     }
 
     // receives a mutable json and parses a Name and removes namespace. Used for canonicalization.
-    // TODO change as above from_json method, should take enclosing namespace.
     pub(crate) fn from_json_mut(
         json: &mut serde_json::map::Map<String, JsonValue>,
         enclosing_namespace: Option<&str>,
@@ -129,13 +123,6 @@ impl Name {
             }
         }
 
-        // if let Some(namespace) = json.get("namespace") {
-        //     if let JsonValue::String(s) = namespace {
-        //         name.set_namespace(s)?;
-        //         json.remove("namespace");
-        //     }
-        // }
-
         Ok(name)
     }
 
@@ -156,24 +143,8 @@ impl Name {
     }
 
     // TODO according to Rust convention, item path separators are :: instead of .
-    // TODO should we add a configurable separator.
-    // TODO should do namespace lookup from enclosing name schema if applicable. (pass enclosing schema as a context)
+    // should we add a configurable separator?
     pub(crate) fn fullname(&self) -> String {
-        // if self.name.contains(".") {
-        //     self.name.to_string()
-        // } else if let Some(n) = &self.namespace {
-        //     if n.is_empty() {
-        //         // According to spec, it's fine to put "" as a namespace, which becomes a null namespace
-        //         format!("{}", self.name)
-        //     } else {
-        //         format!("{}.{}", n, self.name)
-        //     }
-        // } else {
-        //     // The case when only name exists.
-        //     // TODO As of now we just return without any enclosing namespace.
-        //     // TODO pass the most tightly enclosing namespace here when only name is provided.
-        //     self.name.to_string()
-        // }
         if let Some(n) = &self.namespace {
             if n.is_empty() {
                 // According to spec, it's fine to put "" as a namespace, which becomes a null namespace
@@ -270,6 +241,7 @@ impl Field {
         order: Order,
         aliases: Option<Vec<String>>,
     ) -> Result<Self, AvrowErr> {
+        // According to spec, field names also must adhere to a valid nane.
         validate_name(0, name)?;
         Ok(Field {
             name: name.to_string(),

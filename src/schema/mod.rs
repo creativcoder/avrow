@@ -22,7 +22,6 @@ use std::fmt::Debug;
 use std::fs::OpenOptions;
 use std::path::Path;
 
-/// A schema parsed from json value
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum Variant {
     Null,
@@ -59,7 +58,7 @@ pub(crate) enum Variant {
     Named(String),
 }
 
-/// Represents the avro schema used to write encoded avro data
+/// Represents the avro schema used to write encoded avro data.
 #[derive(Debug)]
 pub struct Schema {
     // TODO can remove this if not needed
@@ -80,7 +79,7 @@ impl PartialEq for Schema {
 
 impl std::str::FromStr for Schema {
     type Err = AvrowErr;
-    /// Parse an avro schema from a json string
+    /// Parse an avro schema from a JSON string
     /// One can use Rust's raw string syntax (r##""##) to pass schema.
     fn from_str(schema: &str) -> Result<Self, Self::Err> {
         let schema_json =
@@ -90,8 +89,9 @@ impl std::str::FromStr for Schema {
 }
 
 impl Schema {
-    /// Parses an avro schema from a json description of schema in a file.
-    /// Alternatively, one can use the `FromStr` impl to create a `Schema` from a JSON string:
+    /// Parses an avro schema from a JSON schema in a file.
+    /// Alternatively, one can use the [`FromStr`](https://doc.rust-lang.org/std/str/trait.FromStr.html)
+    /// impl to create the Schema from a JSON string:
     /// ```
     /// use std::str::FromStr;
     /// use avrow::Schema;
@@ -134,7 +134,8 @@ impl Schema {
         self.variant.validate(value, &self.cxt)
     }
 
-    /// Returns the canonical form of an Avro schema
+    /// Returns the canonical form of an Avro schema.
+    /// Example:
     /// ```rust
     /// use avrow::Schema;
     /// use std::str::FromStr;
@@ -150,6 +151,7 @@ impl Schema {
     ///         }]
     ///     }
     /// "##).unwrap();
+    ///
     /// let canonical = schema.canonical_form();
     /// ```
     pub fn canonical_form(&self) -> &CanonicalSchema {
