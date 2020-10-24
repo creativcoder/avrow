@@ -1,17 +1,17 @@
 //! The Writer is the primary interface for writing values in avro encoded format.
 
 use crate::codec::Codec;
-use crate::schema::Schema;
-use crate::value::Value;
 use crate::config::{DEFAULT_FLUSH_INTERVAL, MAGIC_BYTES, SYNC_MARKER_SIZE};
 use crate::error::{AvrowErr, AvrowResult};
 use crate::schema::Registry;
+use crate::schema::Schema;
 use crate::schema::Variant;
 use crate::serde_avro;
 use crate::util::{encode_long, encode_raw_bytes};
 use crate::value::Map;
-use serde::Serialize;
+use crate::value::Value;
 use rand::{thread_rng, Rng};
+use serde::Serialize;
 use std::collections::HashMap;
 use std::default::Default;
 use std::io::Write;

@@ -485,7 +485,7 @@ pub(crate) fn decode_with_resolution<R: Read>(
 pub(crate) fn decode<R: Read>(
     schema: &Variant,
     reader: &mut R,
-    r_cxt: &Registry,
+    w_cxt: &Registry,
 ) -> Result<Value, AvrowErr> {
     let value = match schema {
         Variant::Null => Value::Null,
@@ -538,7 +538,7 @@ pub(crate) fn decode<R: Read>(
 
             let mut it = Vec::with_capacity(block_count as usize);
             for _ in 0..block_count {
-                let decoded = decode(&**items, reader, r_cxt)?;
+                let decoded = decode(&**items, reader, w_cxt)?;
                 it.push(decoded);
             }
 
@@ -550,7 +550,7 @@ pub(crate) fn decode<R: Read>(
             let mut hm = HashMap::new();
             for _ in 0..block_count {
                 let key = decode_string(reader)?;
-                let value = decode(values, reader, r_cxt)?;
+                let value = decode(values, reader, w_cxt)?;
                 hm.insert(key, value);
             }
 
@@ -560,7 +560,7 @@ pub(crate) fn decode<R: Read>(
             let mut v = IndexMap::with_capacity(fields.len());
             for (field_name, field) in fields {
                 let field_name = field_name.to_string();
-                let field_value = decode(&field.ty, reader, r_cxt)?;
+                let field_value = decode(&field.ty, reader, w_cxt)?;
                 let field_value = FieldValue::new(field_value);
                 v.insert(field_name, field_value);
             }
@@ -571,15 +571,22 @@ pub(crate) fn decode<R: Read>(
             };
             Value::Record(rec)
         }
+        Variant::Fixed { size, .. } => {
+            let mut buf = vec![0; *size];
+            reader
+                .read_exact(&mut buf)
+                .map_err(AvrowErr::DecodeFailed)?;
+            Value::Fixed(buf)
+        }
         Variant::Union { variants } => {
             let variant_idx: i64 = reader.read_varint().map_err(AvrowErr::DecodeFailed)?;
-            decode(&variants[variant_idx as usize], reader, r_cxt)?
+            decode(&variants[variant_idx as usize], reader, w_cxt)?
         }
         Variant::Named(schema_name) => {
-            let schema_variant = r_cxt
+            let schema_variant = w_cxt
                 .get(schema_name)
                 .ok_or(AvrowErr::NamedSchemaNotFound)?;
-            decode(schema_variant, reader, r_cxt)?
+            decode(schema_variant, reader, w_cxt)?
         }
         a => {
             return Err(AvrowErr::DecodeFailed(Error::new(

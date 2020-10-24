@@ -71,7 +71,7 @@ impl Record {
     }
 
     /// Creates a record from a [BTreeMap](https://doc.rust-lang.org/std/collections/struct.BTreeMap.html) by consuming it.
-    /// The values in btree must implement Into<Value>. The name provided must match with the name in the record
+    /// The values in BTreeMap must implement Into<Value>. The name provided must match with the name in the record
     /// schema being provided to the writer.
     pub fn from_btree<K: Into<String> + Ord + Display, V: Into<Value>>(
         name: &str,
@@ -242,9 +242,13 @@ impl Value {
                     .write_f64::<LittleEndian>(*d)
                     .map_err(AvrowErr::EncodeFailed)?;
             }
+            (ref value, Variant::Named(name)) => {
+                if let Some(schema) = cxt.get(name) {
+                    value.encode(writer, schema, cxt)?;
+                }
+            }
             // Match with union happens first than more specific match arms
             (ref value, Variant::Union { variants, .. }) => {
-                // the get index function returns the index if the value's schema is in the variants of the union
                 let (union_idx, schema) = resolve_union(&value, &variants, cxt)?;
                 let union_idx = union_idx as i32;
                 writer
@@ -301,7 +305,6 @@ impl Value {
                         .write_varint(idx as i32)
                         .map_err(AvrowErr::EncodeFailed)?;
                 } else {
-                    // perf issues on creating error objects?
                     return Err(AvrowErr::SchemaDataMismatch);
                 }
             }
@@ -637,6 +640,44 @@ mod tests {
         let mut rec = BTreeMap::new();
         rec.insert("foo", "bar");
         let _r = Record::from_btree("test", rec).unwrap();
+    }
+
+    #[derive(Debug, Serialize, Deserialize, PartialEq)]
+    struct SomeRecord {
+        one: Vec<u8>,
+        two: Vec<u8>,
+    }
+
+    #[test]
+    fn named_schema_resolves() {
+        let schema = r##"
+            {
+                "type": "record",
+                "name": "SomeRecord",
+                "aliases": ["MyRecord"],
+                "fields" : [
+                {"name": "one", "type":{"type": "fixed", "size": 5, "name": "md5"}},
+                {"name": "two", "type":"md5"}
+                ]
+            }
+            "##;
+
+        let schema = crate::Schema::from_str(schema).unwrap();
+        let mut writer = crate::Writer::with_codec(&schema, vec![], crate::Codec::Null).unwrap();
+
+        let value = SomeRecord {
+            one: vec![0u8, 1, 2, 3, 4],
+            two: vec![0u8, 1, 2, 3, 4],
+        };
+
+        writer.serialize(&value).unwrap();
+
+        let output = writer.into_inner().unwrap();
+        let reader = crate::Reader::new(output.as_slice()).unwrap();
+        for i in reader {
+            let r: SomeRecord = from_value(&i).unwrap();
+            assert_eq!(r, value);
+        }
     }
 
     #[derive(Debug, Serialize, Deserialize)]
