@@ -45,6 +45,18 @@ pub(crate) fn reader_with_schema<'a>(schema: &Schema, buffer: Vec<u8>) -> Reader
     reader
 }
 
+#[allow(dead_code)]
+pub(crate) fn to_file(path: &str, buffer: &[u8]) {
+    use std::io::Write;
+    let mut f = std::fs::OpenOptions::new()
+        .create(true)
+        .truncate(true)
+        .write(true)
+        .open(path)
+        .unwrap();
+    f.write_all(&buffer).unwrap();
+}
+
 pub(crate) struct MockSchema;
 impl MockSchema {
     // creates a primitive schema

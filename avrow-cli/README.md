@@ -3,29 +3,32 @@
 
 Inspired from avro-tools.jar
 
+## Install
+
+```
+cargo install --path .
+```
+This will install the binary as `av`.
+
 ### Following subcommands are the supported as of now.
 
 ```
-Usage: target/debug/av <command> [<args>]
+avrow-cli 0.1.0
+Command line tool for examining avro datafiles
 
-av: command line tool for examining avro datafiles.
+USAGE:
+    av <SUBCOMMAND>
 
-Options:
-  --help            display usage information
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
 
-Commands:
-  getmeta           Get metadata information of the avro datafile.
-  getschema         Prints the writer's schema encoded in the provided datafile.
-  read              Prints data from datafile as human readable value
-  tobytes           Dumps the avro datafile as bytes for debugging purposes
-  fingerprint       Prints fingerprint of the canonical form of writer's schema.
-  canonical         Prints the canonical form of writer's schema encoded in the
-                    provided datafile.
-canonical
-```
-
-Usage:
-
-```bash
-av read -d ./data.avro 
+SUBCOMMANDS:
+    bytes          Dumps the avro datafile as bytes for debugging purposes
+    canonical      Prints the canonical form of writer's schema encoded in the avro datafile.
+    fingerprint    Prints fingerprint of the canonical form of writer's schema in the avro datafile.
+    help           Prints this message or the help of the given subcommand(s)
+    metadata       Get metadata information of the avro datafile
+    read           Prints data in the avro datafile in debug format
+    schema         Prints the writer's schema encoded in the avro datafile
 ```

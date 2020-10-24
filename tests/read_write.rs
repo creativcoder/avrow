@@ -340,16 +340,12 @@ fn bytes_read_write() {
     writer.serialize(&data).unwrap();
 
     let buf = writer.into_inner().unwrap();
-    // let mut v: Vec<u8> = vec![];
 
     let reader = Reader::with_schema(buf.as_slice(), &schema).unwrap();
     for i in reader {
-        // dbg!(i);
         let b: &[u8] = from_value(&i).unwrap();
-        dbg!(b);
+        assert_eq!(b, &[0u8, 1u8, 2u8, 3u8, 4u8, 5u8]);
     }
-
-    // assert_eq!(v, data);
 }
 
 #[test]
@@ -360,12 +356,6 @@ fn write_invalid_union_data_fails() {
     let mut writer = writer_from_schema(&schema, avrow::Codec::Null);
     writer.serialize("string").unwrap();
 }
-
-// #[derive(Debug, serde::Serialize, serde::Deserialize)]
-// struct LongList {
-//     value: i64,
-//     next: Option<Box<LongList>>,
-// }
 
 #[test]
 #[cfg(feature = "snappy")]

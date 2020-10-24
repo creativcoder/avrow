@@ -77,6 +77,12 @@ impl PartialEq for Schema {
     }
 }
 
+impl std::fmt::Display for Schema {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&self.inner, f)
+    }
+}
+
 impl std::str::FromStr for Schema {
     type Err = AvrowErr;
     /// Parse an avro schema from a JSON string
