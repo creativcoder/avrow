@@ -113,6 +113,8 @@ pub enum AvrowErr {
     ParsingCanonicalForm,
     #[error("Duplicate definition of named schema")]
     DuplicateSchema,
+    #[error("Duplicate field name in record schema")]
+    DuplicateField,
     #[error("Invalid default value for union. Must be the first entry from union definition")]
     FailedDefaultUnion,
     #[error("Invalid default value for given schema")]
