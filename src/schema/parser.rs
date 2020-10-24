@@ -152,6 +152,10 @@ impl Registry {
 
                     let aliases = parse_aliases(o.get("aliases"));
 
+                    if fields_parsed.contains_key(name) {
+                        return Err(AvrowErr::DuplicateField);
+                    }
+
                     fields_parsed.insert(
                         name.to_string(),
                         Field::new(name, ty, default, order, aliases)?,

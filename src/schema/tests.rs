@@ -435,3 +435,21 @@ fn test_two_instance_schema_equality() {
     let schema2 = Schema::from_str(raw_schema).unwrap();
     assert_eq!(schema, schema2);
 }
+
+#[test]
+#[should_panic(expected = "DuplicateField")]
+fn duplicate_field_name_in_record_fails() {
+    let raw_schema = r#"
+        {
+        "type": "record",
+        "name": "Person",
+        "doc": "Hi there.",
+        "fields": [
+            {"name": "id", "type": "string", "default": "dsf8e8"},
+            {"name": "id", "type": "int", "default": 56}
+        ]
+        }
+    "#;
+
+    Schema::from_str(raw_schema).unwrap();
+}
