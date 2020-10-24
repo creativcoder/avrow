@@ -64,7 +64,7 @@ The Avro specification provides two kinds of encoding:
 
 This crate implements only the binary encoding as that's the format practically used for performance and storage reasons.
 
-## Features.
+## Features
 
 * Full support for recursive self-referential schemas with Serde serialization/deserialization.
 * All compressions codecs (`deflate`, `bzip2`, `snappy`, `xz`, `zstd`) supported as per spec.
@@ -139,7 +139,7 @@ fn main() -> Result<(), Error> {
 
 ```
 
-A more involved self-referential recursive schema example:
+### Self-referential recursive schema example
 
 ```rust
 use anyhow::Error;
@@ -202,7 +202,7 @@ fn main() -> Result<(), Error> {
 
 ```
 
-An example of writing a json object with a confirming schema. The json object maps to an `avrow::Record` type.
+### An example of writing a json object with a confirming schema. The json object maps to the `avrow::Record` type.
 
 ```rust
 use anyhow::Error;

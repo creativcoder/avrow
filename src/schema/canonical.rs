@@ -27,8 +27,7 @@ const RELEVANT_FIELDS: [&str; 7] = [
     "name", "type", "fields", "symbols", "items", "values", "size",
 ];
 /// Represents canonical form of an avro schema. This representation removes irrelevant fields
-/// such as docs and aliases in the schema.
-/// Fingerprinting methods are available on this instance.
+/// such as docs and aliases in the schema. Fingerprinting methods are available on this instance.
 #[derive(Debug, PartialEq)]
 pub struct CanonicalSchema(pub(crate) JsonValue);
 

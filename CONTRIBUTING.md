@@ -1,7 +1,29 @@
 
 # Contributing
 
-When contributing to this repository, please first discuss the change you wish to make via issue,
+Some of the features of avrow are feature gated.
+While making changes it's a good idea to build and
+test with `--all-features` flag.
+
+## Building the project
+
+```
+cargo build --all-features
+```
+
+## Running test cases
+
+```
+cargo test --all-features
+```
+
+## Generating and opening documentation locally
+
+```
+BROWSER=firefox cargo doc --no-deps --open
+```
+
+When contributing to this repository, please discuss the change you wish to make via issue,
 email, or any other method with the owners of this repository before making a change. 
 
 Please note we have a [code of conduct](./CODE_OF_CONDUCT.md), please follow it in all your interactions with the project.
