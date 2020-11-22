@@ -357,8 +357,10 @@ fn resolve_union<'a>(
             | (Value::Bytes(_), Variant::Bytes)
             | (Value::Str(_), Variant::Str)
             | (Value::Map(_), Variant::Map { .. })
-            | (Value::Array(_), Variant::Array { .. }) => return Ok((idx, variant)),
-            (Value::Fixed(_), Variant::Fixed { .. }) => return Ok((idx, variant)),
+            | (Value::Array(_), Variant::Array { .. })
+            | (Value::Fixed(_), Variant::Fixed { .. })
+            | (Value::Enum(_), Variant::Enum { .. })
+            | (Value::Record(_), Variant::Record { .. }) => return Ok((idx, variant)),
             (Value::Array(v), Variant::Fixed { size, .. }) => {
                 if v.len() == *size {
                     return Ok((idx, variant));
