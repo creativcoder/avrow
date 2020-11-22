@@ -402,3 +402,71 @@ fn read_deflate_reuse() {
         let _v: LongList = from_value(&i).unwrap();
     }
 }
+
+#[test]
+fn parses_field_record_defined_within_union() {
+    #[derive(Serialize, Deserialize, PartialEq, Debug)]
+    struct Reference {
+        #[serde(rename = "feedReference")]
+        pub feed_reference: Option<FeedReference>,
+    }
+
+    #[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
+    pub struct FeedReference {
+        pub instance: String,
+        pub provider: String,
+    }
+
+    impl Default for FeedReference {
+        fn default() -> FeedReference {
+            FeedReference {
+                instance: String::default(),
+                provider: String::default(),
+            }
+        }
+    }
+
+    let schema = r##"
+        {
+            "name": "Reference",
+            "type": "record",
+            "fields": [
+                {
+                    "name": "feedReference",
+                    "type": [
+                        "null",
+                        {
+                            "name": "FeedReference",
+                            "type": "record",
+                            "fields": [
+                                {
+                                    "name": "instance",
+                                    "type": "string"
+                                },
+                                {
+                                    "name": "provider",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    ],
+                    "default": null
+                }
+            ]
+        }
+        "##;
+
+    let reference = Reference {
+        feed_reference: Some(FeedReference::default()),
+    };
+
+    let schema = Schema::from_str(&schema).unwrap();
+    let mut writer = avrow::Writer::new(&schema, vec![]).unwrap();
+    writer.serialize(&reference).unwrap();
+    let a = writer.into_inner().unwrap();
+    let reader = Reader::new(a.as_slice()).unwrap();
+    for i in reader {
+        let a: Reference = from_value(&i).unwrap();
+        assert_eq!(a, reference);
+    }
+}
