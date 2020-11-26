@@ -6,8 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.2.1 - 2020-11-27
+
 ### Fixed
 - Named schema resolution outside of union variants.
+- Implicitly defined named schemas should resolve in union variants [#6](https://github.com/creativcoder/avrow/issues/6)
+- Default values in union schema fields in records should parse correctly [#1](https://github.com/creativcoder/avrow/issues/1)
 
 ### Updated
 - Documentation.
