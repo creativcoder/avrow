@@ -8,7 +8,7 @@
 //! Add avrow to your `Cargo.toml`:
 //!```toml
 //! [dependencies]
-//! avrow = "0.2.0"
+//! avrow = "0.2.1"
 //!```
 //! ## A hello world example of reading and writing avro data files
 
