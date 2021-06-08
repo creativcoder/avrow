@@ -265,7 +265,7 @@ impl std::convert::TryFrom<&str> for Codec {
             "zstd" => Ok(Codec::Zstd),
             #[cfg(feature = "bzip2")]
             "bzip2" => Ok(Codec::Bzip2),
-            #[cfg(feature = "bzip2")]
+            #[cfg(feature = "xz")]
             "xz" => Ok(Codec::Xz),
             o => Err(AvrowErr::UnsupportedCodec(o.to_string())),
         }
